@@ -89,7 +89,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     # user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    avatar = models.ImageField(default='media/button.png', upload_to='media/')
+    avatar = models.ImageField(default='media/avatar-g7397aeaf8_1280.png', upload_to='media/')
 
     def __str__(self):
         return self.user.email
