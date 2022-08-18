@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-3">
+    
+    <div class="row">
+            
+        <img class="bd-placeholder-img rounded-circle" height=132 width=132 src="{{ profile_user.profile.avatar.url }}"/>
+<h4 class="border-bottom pb-2 my-3">{{ profile_user.name }}님의 보관함</h4>
+<div>
+    <div>
+      팔로잉 : {{ profile_user.followings.count }} / 팔로워 : {{ profile_user.followers.count }}
+    </div>
+    <details>
+        <summary>팔로잉 목록 보기</summary>
+        {% if profile_user.followings.count >= 1 %}
+        {% for following in profile_user.followings.all %}
+        <p>{{ following.name }}</p>
+        {% endfor %}
+        {% else %}
+        <p>팔로잉을 하고 있는 사람이 없습니다.</p>
+        {% endif %}
+     </details>
+     <details>
+        <summary>팔로워 목록 보기</summary>
+        {% if profile_user.followers.count >= 1 %}
+        {% for followers in profile_user.followers.all %}
+            <p>{{ followers.name }}</p>
+        {% endfor %}
+        {% else %}
+            <p>팔로워를 하고 있는 사람이 없습니다.</p>
+        {% endif %}
+     </details>
+          
+  
+    {% if user != profile_user %}
+      <div>
+        <form action="{% url 'account:follow' profile_user.id %}" method='POST'>
+          {% csrf_token %}
+          {% if user in profile_user.followers.all %}
+            <input type="submit" class="btn btn-outline-danger" value='팔로우 취소'>
+          {% else %}
+            <input type="submit" class="btn btn-outline-primary"  value='팔로우'>
+          {% endif %}
+        </form>
+      </div>  
+    {% endif %}
+  </div>                      
+
+<!-- <div id="profile_base">
+        <p class="mb-4">{{ profile_user.name }}님의 의 보관함 내용입니다.</p>
+</div> -->
+
+<!-- 답변 표시 Start -->
+
+
+<table class="table">
+    <thead>
+        <tr class="text-center thead-dark">
+            <th>번호</th>
+            <th>구분</th>
+            <th>추천</th>
+            <th style="width:50%">제목</th>
+            <th>글쓴이</th>
+            <th>작성일시</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% if page_obj %}
+    {% for object in page_obj %}
+    <tr class="text-center">
+        <td>{{ forloop.counter }}</td>
+        <td>{{ object.category.description }}</td>
+        <td>
+            {% if object.voter.count > 0 %}
+                <span class="badge badge-warning px-2 py-1">{{ object.voter.count }}</span>
+            {% else %}
+                <span class="badge badge-light px-2 py-1" style="color:#ccc;">0</span>
+            {% endif %}
+        </td>
+        
+        <td class="text-center">
+            {% if object.subject %}
+                <a href="{% url 'wyw:detail' object.id %}">{{ object.subject }}</a>
+                <!-- <a href="{{ object.get_absolute_url }}">{{ object.subject }}</a> -->
+            {% else %}
+                <a href="{% url 'wyw:detail' object.id %}">{{ object.content }}</a>
+            {% endif %}
+        </td>
+        <td>{{ object.author.name }}</td>
+        <td>{{ object.create_date|date:'Y-m-d H' }}</td>
+    </tr>
+    {% endfor %}
+    {% else %}
+    <tr>
+        <td colspan="3">보관함에 담긴 글이 없습니다.</td>
+    </tr>
+    {% endif %}
+    </tbody>
+</table>
+</div>
+</div>
+
+
+
+<!-- 페이징처리 시작 -->
+
+<form id="searchForm" method="get">
+    <input type="hidden" id="page" name="page" value="{{ page }}">
+{#    <input type="hidden" id="so" name="so" value="{{ so }}">#}
+</form>
+{% endblock %}
+
+{% block script %}
+<script type='text/javascript'>
+    $(document).ready(function(){
+        $(".page-link").on('click', function() {
+            $("#page").val($(this).data("page"));
+            $("#searchForm").submit();
+        });
+    });
+</script>
+{% endblock %}

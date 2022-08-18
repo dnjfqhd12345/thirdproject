@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load posting_filter %}
+{% block content %}
+<div class="container my-3">
+    <div class="row">
+
+        <div class="col-sm-12 col-md-3 col-lg-2 p-2">
+<!-- Sidebar  -->
+<nav id="sidebar" class="border-top border-secondary">
+    <div class="list-group">
+        {% for cat in category_list %}
+            {% if cat == category %}
+                <a class="rounded-0 list-group-item list-group-item-action list-group-item-light active"
+                   href="{{ cat.get_absolute_url }}">{{ cat.description }}</a>
+            {% else %}
+                <a class="rounded-0 list-group-item list-group-item-action list-group-item-light"
+                   href="{{ cat.get_absolute_url }}">{{ cat.description }}</a>
+            {% endif %}
+        {% endfor %}
+        <a class="rounded-0 list-group-item list-group-item-action list-group-item-light"
+        href="{% url 'wyw:ranking' %}">{{ "인기있는 보관함" }}</a>
+        {% if user.is_authenticated %}
+        <a class="rounded-0 list-group-item list-group-item-action list-group-item-light"
+        href="{% url 'account:profile' %}">{{ "프로필 사진 수정" }}</a>
+        {% else %}
+        {% endif %}
+    </div>
+    
+</nav>
+        </div>
+
+        <div class="col-sm-12 col-md-9 col-lg-10 p-2">
+
+
+    <div class="row my-3">
+                        
+    
+    <table class="table">
+        <thead>
+            <tr class="text-center thead-dark">
+                <th>순위</th>
+                <th>이름</th>
+                <th style="width:50%">보관함 바로가기</th>
+                <th>팔로잉 수</th>
+                <th>팔로워 수</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if allUser %}
+            {% for user in allUser %}
+            <tr class="text-center">
+                <td>{{ forloop.counter }} 위</td>
+                <td>
+                        {{ user.name }}
+                </td>
+                <td>
+                    <a href="{% url 'account:profile_scrap' user.id %}">
+                    {{ user.name }}
+                </a>
+            </td>
+                <td> {{ user.followings.count }} </td>
+                <td>{{user.followers.count}}</td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            <tr>
+                <td colspan="4">회원이 없습니다.</td>
+            </tr>
+            {% endif %}
+            </tbody>
+    </table>
+    
+    <!-- 페이징 처리 시작 -->
+    <ul class="pagination justify-content-center">
+        <!-- 이전 페이지 -->
+        {% if allUser.has_previous %}
+        <li class="page-item">
+            <a class="page-link" data-page="{{ allUser.previous_page_number }}"
+            href="javascript:void(0)">이전</a>
+         </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tableindex="-1" aria-disabled="true" href="#">
+                이전
+            </a>
+        </li>
+        {% endif %}
+        <!-- 페이지 리스트 -->
+        {% for page_number in allUser.paginator.page_range %}
+        {% if page_number >= allUser.number|add:-5 and page_number <= allUser.number|add:5 %}
+            {% if page_number == allUser.number %}
+            <li class="page-item active" aria-current="page">
+                <a class="page-link" href="?page={{ page_number }}"
+                href="javascript:void(0)">{{page_number}}</a>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{page_number}}"
+                href="javascript:void(0)">{{ page_number }}</a>
+            </li>
+            {% endif %}
+        {% endif %}
+        {% endfor %}
+                <!-- 페이지 리스트 -->
+                {% for page_number in allUser.paginator.page_range %}
+                {% if page_number >= allUser.number|add:-5 and page_number <= allUser.number|add:5 %}
+                    {% if page_number == allUser.number %}
+                    <li class="page-item active" aria-current="page">
+                        <a class="page-link" href="?page={{ page_number }}"
+                        href="javascript:void(0)">{{page_number}}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{page_number}}"
+                        href="javascript:void(0)">{{ page_number }}</a>
+                    </li>
+                    {% endif %}
+                {% endif %}
+                {% endfor %}
+        
+        <!-- 다음 페이지 -->
+        {% if allUser.has_next %}
+        <li class="page-item">
+            <a class="page-link" data-page="{{ allUser.next_page_number }}"
+                href="javascript:void(0)">다음</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" tableindex="-1" aria-disabled="true" href="javascript:void(0)">
+                다음
+            </a>
+        </li>
+        {% endif %}
+    </ul>
+</div>
+
+<form id="searchForm" method="get" action="{% url 'index' %}">
+    <input type="hidden" id="kw" name="kw" value="{{ kw|default_if_none:'' }}">
+    <input type="hidden" id="page" name="page" value="{{ page }}">
+    <input type="hidden" id="so" name="so" value="{{ so }}">
+</form>
+<div class="container my-3">
+    <div class="row">
+
+        <div class="col-sm-12 col-md-3 col-lg-2 p-2">
+<!-- Sidebar  -->
+
+{% endblock %}
+{% block script %}
+<script type='text/javascript'>
+const page_elements = document.getElementsByClassName("page-link");
+Array.from(page_elements).forEach(function(element) {
+    element.addEventListener('click', function() {
+        document.getElementById('page').value = this.dataset.page;
+        document.getElementById('searchForm').submit();
+    });
+});
+const btn_search = document.getElementById("btn_search");
+btn_search.addEventListener('click', function() {
+    document.getElementById('kw').value = document.getElementById('search_kw').value;
+    document.getElementById('page').value = 1;  // 검색버튼을 클릭할 경우 1페이지부터 조회한다.
+    document.getElementById('searchForm').submit();
+    
+const so_ele = document.getElementsByClassName("so");
+});
+</script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+<script type='text/javascript'>
+    $(document).ready(function(){
+        $(".so").on('change', function() {
+        $("#so").val($(this).val());
+        $("#page").val(1);
+        $("#searchForm").submit();
+    });
+});
+</script>
+{% endblock %}
+<!-- {% if posting_list %}
+    <ul>
+        {% for Posting in posting_list %}
+            <li><a href="{% url 'wyw:detail' Posting.id %}">{{Posting.subject}}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>질문이 없습니다.</p>
+{% endif %} -->

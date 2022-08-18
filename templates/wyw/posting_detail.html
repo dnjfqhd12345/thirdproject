@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+{% block content %}
+{% load static %}
+<div class="container my-3">
+    <!-- message 표시 -->
+    {% if messages %}
+    <div class="alert alert-danger my-3" role="alert">
+    {% for message in messages %}
+        <strong>{{ message.tags }}</strong>
+        <ul><li>{{ message.message }}</li></ul>
+    {% endfor %}
+    </div>
+    {% endif %}
+    <h2 class="border-bottom py-2">{{ posting.subject }}</h2>
+    <img class="bd-placeholder-img rounded-circle" height=132 width=132 src="{{posting.logo}}" alt="">
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="card-text" style="white-space: pre-line;">{{ posting.content| safe  }}</div>            <div class="d-flex justify-content-end">
+
+                {% if posting.modify_date %}
+                <div class="badge bg-light text-dark p-2 text-start mx-3">
+                    <div class="mb-2">수정된 날짜</div>
+                    <div>{{ posting.modify_date|date:'Y-m-d H' }}</div>
+                </div>
+                {% endif %}    
+                <div class="badge badge-light p-2 text-start">
+                    <div class="content-section">
+                        <img class="bd-placeholder-img rounded-circle" height=132 width=132 src="{{ posting.author_avatar.avatar.url }}"/>
+                    </div>                      
+                    <h4><a href="{% url 'account:profile_scrap' posting.author.id %}" class="badge rounded-pill bg-danger" style="text-decoration:none">{{ posting.author.name }}</a></h4>
+                    <div>{{ posting.create_date|date:'Y-m-d H' }}</div>
+
+                </div>
+            </div>
+            <div class="my-3">
+                <a href="javascript:void(0)" data-uri="{% url 'wyw:posting_vote' posting.id  %}"
+                class="recommend btn btn-sm btn-outline-secondary"> 추천
+                 <span class="badge rounded-pill bg-success">{{posting.voter.count}}</span>
+             </a> 
+             <a href="{% url 'wyw:posting_scrap' posting.id%}" class="btn btn-primary">보관함 담기</a>
+             <div class="text-center">이 글을 보관함으로 가져간 사람 수:{{posting.scraper.count}}</div>
+                <div class="text'center">이 글의 평점 {{avg_score}} 점</div>
+                {% if request.user == posting.author %}
+                <a href="{% url 'wyw:posting_modify' posting.id  %}" 
+                   class="btn btn-sm btn-outline-secondary">수정</a>
+                   <a href="javascript:void(0)" class="delete btn btn-sm btn-outline-secondary"
+                   data-uri="{% url 'wyw:posting_delete' posting.id  %}">삭제</a>            
+                {% endif %}
+        </div>
+    </div>
+    <h5 class="border-bottom my-3 py-2">{{posting.comment_set.count}}개의 댓글이 있습니다.</h5>
+    {% for comment in posting.comment_set.all %}
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="card-text" style="white-space: pre-line;">{{ comment.content }}</div>
+            <div class="d-flex justify-content-end">
+                {% if comment.modify_date|date:'Y-m-d H' %}
+                <div class="badge bg-light text-dark p-2 text-start mx-3">
+                    <div class="mb-2">수정된 날짜</div>
+                    <div>{{ comment.modify_date|date:'Y-m-d H' }}</div>
+                </div>
+                {% endif %}    
+                <div class="badge badge-light p-2 text-start">
+                    <div class="mb-2">{{ comment.author.name }}</div>
+                    <div>{{ comment.create_date|date:'Y-m-d H' }}</div>
+                    <div class="mb-2">평가한 평점</div>
+                    <div>{{ comment.score }} 점</div>
+                </div>
+            </div>
+            <div class="my-3">
+                {% if request.user == comment.author %}
+                <a href="{% url 'wyw:comment_modify' comment.id  %}" 
+                   class="btn btn-sm btn-outline-secondary">수정</a>
+                   <a href="#" class="delete btn btn-sm btn-outline-secondary "
+                   data-uri="{% url 'wyw:comment_delete' comment.id  %}">삭제</a>    
+                {% endif %}
+            </div>    
+            </div>    
+        </div>
+    </div>
+    {% endfor %}
+    <form action="{% url 'wyw:comment_create' posting.id %}" method="post" class="my-3">
+        {% csrf_token %}
+        {% if form.errors %}
+        <div class="alert alert-danger" role="alert">
+        {% for field in form %}
+            {% if field.errors %}
+            <strong>{{ field.label }}</strong>
+            {{ field.errors }}
+            {% endif %}
+        {% endfor %}
+        </div>
+        {% endif %}
+        <div class="form-group">
+            <textarea {% if not user.is_authenticated %}disabled{% endif %}
+              name="content" id="content" class="form-control" rows="10"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="score" class="form-label">평점</label>
+            <select name="score">
+                <option value="1">1점</option>
+                <option value="2">2점</option>
+                <option value="3" selected="selected">3점</option>
+                <option value="4">4점</option>
+                <option value="5">5점</option>
+            </select>
+        </div>
+        
+
+            <input type="submit" value="댓글" class="btn btn-primary">
+    </form>
+
+</div>
+{% endblock %}
+{% block script %}
+<script type='text/javascript'>
+const delete_elements = document.getElementsByClassName("delete");
+Array.from(delete_elements).forEach(function(element) {
+    element.addEventListener('click', function() {
+        if(confirm("정말로 삭제하시겠습니까?")) {
+            location.href = this.dataset.uri;
+        };
+    });
+});
+const recommend_elements = document.getElementsByClassName("recommend");
+Array.from(recommend_elements).forEach(function(element) {
+    element.addEventListener('click', function() {
+        if(confirm("정말로 추천하시겠습니까?")) {
+            location.href = this.dataset.uri;
+        };
+    });
+});
+</script>
+<style>
+    #myform fieldset{
+    display: inline-block; /* 하위 별점 이미지들이 있는 영역만 자리를 차지함.*/
+    direction: rtl; /* 이모지 순서 반전 */
+    border: 0; /* 필드셋 테두리 제거 */
+}
+#myform fieldset legend{
+    text-align: left;
+}
+#myform input[type=radio]{
+    display: none; /* 라디오박스 감춤 */
+}
+#myform label{
+    font-size: 3em; /* 이모지 크기 */
+    color: transparent; /* 기존 이모지 컬러 제거 */
+    text-shadow: 0 0 0 #f0f0f0; /* 새 이모지 색상 부여 */
+}
+#myform label:hover{
+    text-shadow: 0 0 0 #a00; /* 마우스 호버 */
+}
+#myform label:hover ~ label{
+    text-shadow: 0 0 0 #a00; /* 마우스 호버 뒤에오는 이모지들 */
+}
+#myform input[type=radio]:checked ~ label{
+    text-shadow: 0 0 0 #a00; /* 마우스 클릭 체크 */
+}
+</style>
+{% endblock %}
