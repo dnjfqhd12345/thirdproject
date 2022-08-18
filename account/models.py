@@ -29,14 +29,10 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, date_of_birth, favorites_1, favorites_2, password,name):
+    def create_superuser(self, email,  password):
         user = self.create_user(
             email,
             password=password,
-            date_of_birth=date_of_birth,
-            favorites_1 =favorites_1,
-            favorites_2 = favorites_2,
-            name = name,
         )
         user.is_admin = True
         user.save(using=self._db)
