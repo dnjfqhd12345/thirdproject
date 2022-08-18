@@ -29,16 +29,18 @@ class UserManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email,  password):
+    def create_superuser(self, email, date_of_birth, favorites_1, favorites_2, password,name):
         user = self.create_user(
             email,
-            password=password
+            password=password,
+            date_of_birth=date_of_birth,
+            favorites_1 =favorites_1,
+            favorites_2 = favorites_2,
+            name = name,
         )
         user.is_admin = True
         user.save(using=self._db)
         return user
-
-
 
 
 class User(AbstractBaseUser):
@@ -47,12 +49,12 @@ class User(AbstractBaseUser):
         max_length=255,
         unique=True,
     )
-    date_of_birth = models.DateField(blank=True, null=True)
+    date_of_birth = models.DateField()
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-    favorites_1 = models.CharField(blank=True, null=True,max_length= 200, choices = favorites_list, default='')
-    favorites_2 = models.CharField(blank=True, null=True,max_length= 200, choices = favorites_list, default='')
-    name = models.CharField(blank=True, null=True,max_length= 200, default='')
+    favorites_1 = models.CharField(max_length= 200, choices = favorites_list, default='')
+    favorites_2 = models.CharField(max_length= 200, choices = favorites_list, default='')
+    name = models.CharField(max_length= 200, default='')
     followings = models.ManyToManyField('self', symmetrical=False, related_name='followers')
 
     
@@ -64,7 +66,7 @@ class User(AbstractBaseUser):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
-    # REQUIRED_FIELDS = ['date_of_birth','favorites_1','favorites_2','name']
+    REQUIRED_FIELDS = ['date_of_birth','favorites_1','favorites_2','name']
 
     def __str__(self):
         return self.email
