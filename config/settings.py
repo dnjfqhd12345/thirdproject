@@ -12,8 +12,9 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 
 from pathlib import Path
 
-import os 
+import os, json
 import pymysql
+from django.core.exceptions import ImproperlyConfigured
 pymysql.install_as_MySQLdb()
 
 
@@ -23,15 +24,27 @@ pymysql.install_as_MySQLdb()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+secret_file = os.path.join(BASE_DIR, 'secrets.json')
+
+with open(secret_file) as f:
+    secrets = json.loads(f.read())
+
+def get_secret(setting, secrets=secrets):
+    try:
+        return secrets[setting]
+    except KeyError:
+        error_msg = 'Set the {} environment variable'.format(setting)
+        raise ImproperlyConfigured(error_msg)
+
+SECRET_KEY = get_secret("SECRET_KEY")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 's8ci-9sv%p+bh2##%g-)gx&+nx(h9blik7g3*7nhu9o&#chhmc'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
@@ -46,7 +59,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'wyw',
-    # 'common'
     'account',
     'django_summernote',
     'rest_framework',
@@ -95,11 +107,11 @@ DATABASES = {
     'default': {
 
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'whatyourwebDB',  #mysql
-        'USER': 'admin', #root
-        'PASSWORD': 'dlrl4549', #1234
-        'HOST': 'whatyourwebdb.cfggt3ooinwq.ap-northeast-2.rds.amazonaws.com', #공백으로 냅두면 default localhost
-        'PORT': '3306', #공백으로 냅두면 default 3306
+        'NAME': get_secret('DJANGO_DB_NAME'),  #mysql
+        'USER': get_secret("DJANGO_DB_USERNAME"), #root
+        'PASSWORD': get_secret("DJANGO_DB_PASSWORD"), #1234
+        'HOST': get_secret("DJANGO_DB_HOST"), #공백으로 냅두면 default localhost
+        'PORT': get_secret("DJANGO_DB_PORT"), #공백으로 냅두면 default 3306
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
             'charset': 'utf8mb4', # 테이블 생성 자동으로 해줄때 쓸 인코딩,, 이거안하면 밑에꺼해도 효과 엑스

@@ -153,7 +153,7 @@ def profile(request):
         profile_form = UpdateProfileForm(instance=request.user.profile)
 
 
-    return render(request, 'wyw/profile.html', {'profile_form': profile_form })
+    return render(request, 'wyw/profile.html', {'profile_form': profile_form, 'UserCreationForm': UserCreationForm, })
 
 @login_required
 def follow(request, user_id):
