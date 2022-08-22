@@ -27,7 +27,7 @@ class Posting(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='category_posting')
     scraper = models.ManyToManyField(User, related_name='scrap_posting')  # through는 연결할 모델을 의미한다.
     scrap_counter = models.IntegerField(default=0)  # 불필요한 연산 없이 진행하기 위해.
-    logo = models.URLField(max_length=200)
+    logo = models.URLField(null=True, blank=True, max_length=200)
 
 
 

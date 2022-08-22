@@ -1,3 +1,4 @@
+from msilib.schema import Error
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render, render, redirect
@@ -25,12 +26,18 @@ def posting_create(request, category_name):
 
             posting.category = category
 
-            response = requests.get(request.POST.get("logo", ""))
+            try:
 
-            if response.status_code == 200:
-                html = response.text
-                soup = BeautifulSoup(html, 'html.parser')
-                image = soup.select_one('meta[property="og:image"]')['content']
+                response = requests.get(request.POST.get("logo", ""))
+
+                if response.status_code == 200:
+                    html = response.text
+                    soup = BeautifulSoup(html, 'html.parser')
+                    print(type(response))
+                    image = soup.select_one('meta[property="og:image"]')['content']
+            except Exception as e:
+                    print("이미지없음")
+                    image = 'https://cdn.vectorstock.com/i/1000x1000/06/25/unknown-document-simple-icon-file-with-question-vector-20980625.webp'
 
 
 

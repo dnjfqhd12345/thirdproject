@@ -78,9 +78,8 @@ def signup(request):
             return redirect('index')
     else:
         form = UserCreationForm()
-        profile_form = UpdateProfileForm()
 
-    return render(request, 'account/signup.html', {'form': form, 'profile_form': profile_form})
+    return render(request, 'account/signup.html', {'form': form, })
 
 def profile_base(request, user_id):
     user = get_object_or_404(User, pk=user_id)
