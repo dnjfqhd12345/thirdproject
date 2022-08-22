@@ -71,13 +71,18 @@ def posting_modify(request, posting_id):
         if form.is_valid():
             posting = form.save(commit=False)
             posting.modify_date = timezone.now()  # 수정일시 저장
-            response = requests.get(request.POST.get("logo", ""))
+            try:
 
-            if response.status_code == 200:
-                html = response.text
-                soup = BeautifulSoup(html, 'html.parser')
-                image = soup.select_one('meta[property="og:image"]')['content']
+                response = requests.get(request.POST.get("logo", ""))
 
+                if response.status_code == 200:
+                    html = response.text
+                    soup = BeautifulSoup(html, 'html.parser')
+                    print(type(response))
+                    image = soup.select_one('meta[property="og:image"]')['content']
+            except Exception as e:
+                    print("이미지없음")
+                    image = 'https://cdn.vectorstock.com/i/1000x1000/06/25/unknown-document-simple-icon-file-with-question-vector-20980625.webp'
 
 
 
