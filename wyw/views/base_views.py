@@ -135,9 +135,9 @@ def agecal(request):
         totaldate = retirementdate - date_of_enter # 정년 - 입사
         currentdate = datenow - date_of_enter # 지금 - 입사
         restdate = retirementdate - datenow
-        percent = float(currentdate.days/totaldate.days)*100
+        percent = round(float(currentdate.days/totaldate.days)*100,2)
         print("퍼센트: ", percent)
-        restpercent = 100-percent
+        restpercent = round(100-percent,2)
 
 
 
