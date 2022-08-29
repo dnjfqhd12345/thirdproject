@@ -14,6 +14,9 @@ from ..serializers import CategorySerializer
 from ..serializers import PostingSerializer
 from ..serializers import CommentSerializer
 from rest_framework import generics
+from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
+
 
 class CategoryPost(generics.ListCreateAPIView):
     queryset = Category.objects.all()
@@ -114,6 +117,44 @@ def detail(request, posting_id):
 def profile(request):
     context = {'user': request.user}
     return render(request, 'wyw/profile.html', context)
+
+def agecal(request):
+    if request.method == 'POST':
+        date_of_birth = (request.POST['date_of_birth'])
+        date_of_enter = (request.POST['date_of_enter'])
+        retirement = int(request.POST['retirement'])
+        datenow = datetime.now()
+        date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d') # str을 datetime타입으로 변경
+        date_of_enter = datetime.strptime(date_of_enter, '%Y-%m-%d')
+        year = date_of_birth.strftime("%Y") # 태어난 날의 년도
+        currentage = int(datenow.strftime("%Y"))-int(year) # 현재 만 나이
+        restyear = retirement - currentage # 정년까지 남은 년도
+
+        retirementdate = datenow + relativedelta(years=restyear)
+        entertocurrent = datenow - date_of_enter
+        totaldate = retirementdate - date_of_enter # 정년 - 입사
+        currentdate = datenow - date_of_enter # 지금 - 입사
+        restdate = retirementdate - datenow
+        percent = float(currentdate.days/totaldate.days)*100
+        print("퍼센트: ", percent)
+        restpercent = 100-percent
+
+
+
+        print("전체 근무 시간: ", totaldate)
+        print("현재 근무 시간: ", currentdate)
+
+        print("근속년수는: ", entertocurrent)
+        print("정년퇴직날짜: ", retirementdate)
+        print("현재 당신의 나이는 ", currentage)
+        print("정년퇴직까지 남은 날: ", restyear)
+        print(date_of_birth)
+        print(date_of_birth-datenow)
+        print(retirement-30)
+        context = {'restpercent':restpercent, 'restdate':restdate,'percent':percent, 'age': currentage, 'entertocurrent':entertocurrent, 'retirementdate': retirementdate, 'restyear': restyear}
+        return render(request, 'wyw/ageCalculator.html', context)
+    percent = 0
+    return render(request, 'wyw/ageCalculator.html', {'percent':percent})
 
 def ranking(request):
     user_list = User.objects.all().order_by('-followers')

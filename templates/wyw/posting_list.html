@@ -22,6 +22,8 @@
                 {% endfor %}
                 <a class="rounded-0 list-group-item list-group-item-action list-group-item-light"
                 href="{% url 'wyw:ranking' %}">{{ "인기있는 보관함" }}</a>
+                <a class="rounded-0 list-group-item list-group-item-action list-group-item-light"
+                href="{% url 'wyw:agecal' %}">{{ "정년계산기" }}</a>
                 {% if user.is_authenticated %}
                 <a class="rounded-0 list-group-item list-group-item-action list-group-item-light"
                 href="{% url 'account:profile_scrap' user.id %}">{{ "나의 보관함" }}</a>

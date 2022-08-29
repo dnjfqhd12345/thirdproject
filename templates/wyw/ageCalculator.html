@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% block content %}
+<style>
+    #jb {
+        width: 100%;
+        height: 50px;
+    }
+    .progress-bar span {
+    position: absolute;
+    display: inline-block;
+    color: rgb(255, 255, 255);
+    text-align: right;
+}
+
+
+progress {
+    width: 100%;
+}
+
+
+
+</style>
+
+<div class="container my-3">
+    <div class="row-10">
+    <form method="post">
+        {% csrf_token %}
+        <fieldset class="border p-2">
+            <legend  class="w-auto">정년계산기 v1.0</legend>
+            <div>
+        <label for="date_of_birth">본인의 출생일을 입력해주세요.</label>
+        <input type="date" name="date_of_birth"
+               value="{{ form.date_of_birth.value|default_if_none:'' }}">
+        </div>
+        <div>
+        <label for="date_of_enter">본인의 입사일을 입력해주세요.</label>
+        <input type="date" name="date_of_enter"
+                value="{{ form.date_of_birth.value|default_if_none:'' }}">       
+        </div>
+        <br>
+        <div class="col-3">
+            <label for="exampleFormControlInput1" class="form-label">귀사의 정년은 (만)몇세입니까?</label>
+            <input type="number" class="form-control" id="retirement" name="retirement" placeholder="여기에 숫자를 입력해주세요.">
+          </div>
+          <br>
+                  <button type="submit" onclick="moveBar()" id="submit" class="btn btn-primary">계산하기</button>
+                  </fieldset>
+    </form>
+    </div>
+    
+    <br>
+
+    <fieldset class="border p-2">
+        <legend  class="w-auto">계산결과</legend>
+    <p>귀하의 현재나이는 {{age}}세입니다.</p>
+    <p>귀하의 정년퇴직 날짜는 {{retirementdate}}입니다.</p>
+    <p>귀하의 현재근속년수는 {{entertocurrent}}입니다.</p>
+    <p>귀하의 현재 정년퇴직까지 {{restdate}}남았습니다.</p>
+
+
+
+    <br>
+    <p>회사생활 진행도</p>
+    <div class="progress-bar">
+        <span data-value="60">{{percent}}%</span>
+        <progress value={{percent}} id="jb" max="100"></progress>
+    </div>
+    
+
+
+      <p>{{restpercent}}%만 더하면 정년! </p>
+
+
+
+
+{% endblock %}
+

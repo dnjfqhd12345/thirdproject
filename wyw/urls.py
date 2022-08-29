@@ -9,6 +9,8 @@ app_name = 'wyw'
 
 urlpatterns = [
      path('profile/', base_views.profile, name='profile'),
+     path('agecal/', base_views.agecal, name='agecal'),
+
     # path('',base_views.index, name='index'),
     # path('<int:posting_id>/', base_views.detail, name='detail'),
     # path('comment/create/<int:posting_id>/', posting_views.comment_create , name='comment_create'),
