@@ -160,6 +160,10 @@ def ranking(request):
     user_list = User.objects.all().order_by('-followers')
     return render(request, 'wyw/ranking.html', {'allUser':user_list})
 
+def tetris(request):
+    return render(request, 'wyw/tetris.html')
+
+
 @login_required(login_url='account:login')
 def recommend(request):
     category = Category.objects.all()

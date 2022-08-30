@@ -1,0 +1,359 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>테트리스</title>
+    {% load static %}
+    <link href="{% static '\tetris\common.css' %}" rel="stylesheet"/>
+</head>
+<body>
+    <div class="wrap">
+        <div class="main-contests">
+            <canvas id="main-board" class="main-board"></canvas>
+        </div>
+        <div id="side-contents" class="side-contents">
+            <canvas id="next-board" class="next-board"></canvas>
+            <p>레벨: <span id="level">1</span></p>
+            <p>라인: <span id="lines">0</span></p>
+            <p>점수: <span id="score">0</span> <span id="add-score" class="add-score"></span></p>
+            <p>
+                <button type="button" id="start-button" onclick="start()" class="btn btn-primary">게임시작</button>
+
+            </p>
+            <p>
+                <button type="button" button id="quit-button" onclick="quit()" class="btn btn-danger">게임종료</button>
+
+            </p>
+            <p>
+                <button type="button" button id="pause-button" onclick="pause()" class="btn btn-warning">일시정지</button>
+
+            </p>
+
+        </div>
+    </div>
+    <!-- 합쳐지고 최소화된 최신 CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+<!-- 부가적인 테마 -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+<!-- 합쳐지고 최소화된 최신 자바스크립트 -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
+<style>
+    html {
+    font-size: 10px;
+}
+
+.wrap {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    width: fit-content;
+}
+
+.main-contents {
+    padding: 1vw;
+}
+
+.side-contents {
+    padding: 1vw;
+    font-size: 1.6rem;
+}
+
+.main-board {
+    border: 2px solid black;
+}
+
+.next-board {
+    border: 2px solid black;
+}
+</style>
+<script>
+    function getRandomIndex(length) {
+    return Math.floor(Math.random()*length);
+}
+
+function clone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+}
+
+function drawBlock(block, ctx) {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    block.shape.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if(value > 0) {
+                ctx.fillStyle = 'black';
+                ctx.fillRect(x + block.x, y + block.y, 1, 1);
+            }
+        });
+    });
+}
+
+function drawBoard(matrix, ctx) {
+    matrix.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if(value > 0) {
+                ctx.fillStyle = 'black';
+                ctx.fillRect(x, y, 1, 1);
+            }
+        });
+    });
+}
+const canvasMainBoard = document.querySelector('#main-board');
+const ctxMainBoard = canvasMainBoard.getContext('2d');
+const canvasNextBoard = document.querySelector("#next-board");
+const ctxNextBoard = canvasNextBoard.getContext('2d');
+
+const COLS_MAIN_BOARD = 10;
+const ROWS_MAIN_BOARD=20;
+const COLS_NEXT_BOARD = 4;
+const ROWS_NEXT_BOARD = 4;
+
+var mainBlock = null;
+var nextBlock = null;
+
+const matrixMainBoard = initMatrix(ROWS_MAIN_BOARD, COLS_MAIN_BOARD);
+
+let time = 0;
+let requestAnimationId = null;
+
+function resize() {
+    const WINDOW_INNERWIDTH = (window.innerWidth > 660)?660:window.innerWidth;
+    const MAIN_CONTENTS_WIDTH = Math.floor(WINDOW_INNERWIDTH*0.6);
+    const BLOCK_SIZE = Math.floor(MAIN_CONTENTS_WIDTH/COLS_MAIN_BOARD);
+
+    ctxMainBoard.canvas.width = BLOCK_SIZE*COLS_MAIN_BOARD;
+    ctxMainBoard.canvas.height = BLOCK_SIZE*ROWS_MAIN_BOARD;
+    ctxMainBoard.scale(BLOCK_SIZE, BLOCK_SIZE);
+
+    ctxNextBoard.canvas.width = BLOCK_SIZE*COLS_NEXT_BOARD;
+    ctxNextBoard.canvas.height = BLOCK_SIZE*ROWS_NEXT_BOARD;
+    ctxNextBoard.scale(BLOCK_SIZE, BLOCK_SIZE);
+
+    const FONT_RATIO = WINDOW_INNERWIDTH/350;
+    document.querySelector("#side-contents").getElementsByClassName.fontSize = FONT_RATIO+'rem'
+}
+
+(function (){
+    main();
+})();
+
+function main() {
+    window.addEventListener('keydown', keyHandler);
+    mainBlock = createNextBlock();
+    nextBlock = createNextBlock();
+    rebuild();
+    window.addEventListener('resize', resize);
+    repeatMotion(0);
+}
+
+function createNextBlock() {
+    const nextBlock = {
+        x: 0,
+        y: 0,
+        shape: randomNextBlockMatrix()
+    }
+
+    return nextBlock;
+}
+
+
+
+function rebuild() {
+    resize();
+    drawBlock(mainBlock, ctxMainBoard);
+    drawBlock(nextBlock, ctxNextBoard);
+    drawBoard(matrixMainBoard, ctxMainBoard); //추가된 부분
+}
+
+function keyHandler(event) {
+    const inputKey = event.keyCode;
+
+    const KEY = {
+        LEFT: 37,
+        UP: 38,
+        RIGHT: 39,
+        DOWN: 40
+    }
+
+    switch(inputKey) {
+        case KEY.UP :
+            validRotate(mainBlock, matrixMainBoard);
+            break;
+        case KEY.DOWN :
+            validMove(mainBlock, matrixMainBoard, 0, 1);
+            break;
+        case KEY.LEFT :
+            validMove(mainBlock, matrixMainBoard, -1, 0);
+            break;
+        case KEY.RIGHT :
+            validMove(mainBlock, matrixMainBoard, 1, 0);
+            break;
+    }
+
+    drawBlock(mainBlock, ctxMainBoard);
+}
+
+function repeatMotion(timeStamp) {
+    const duration = timeStamp - time;
+
+    if(duration > 1000) {
+        if(!validMove(mainBlock, matrixMainBoard, 0, 1)) {
+            stack(mainBlock, matrixMainBoard); //추가 부분
+            mainBlock = nextBlock;
+            nextBlock = createNextBlock();
+            
+            /* 추가 부분 시작 */
+            matrixMainBoard[0].some((value, x) => {
+                if(value > 0) {
+                    window.cancelAnimationFrame(requestAnimationId);
+                    requestAnimationId = null;
+                    return true;
+                }
+            });
+            
+            if(requestAnimationId == null) {
+                return;
+            }
+            /* 추가 부분 끝 */
+        }
+        time = timeStamp;
+    }
+
+    rebuild();
+    requestAnimationId = window.requestAnimationFrame(repeatMotion);
+}
+function randomNextBlockMatrix() {
+    const BLOCK_SET = [
+        [
+            [1,1],
+            [1,1]
+        ],
+        [
+            [0,2,0],
+            [2,2,2],
+            [0,0,0]
+        ],
+        [
+            [0,3,3],
+            [3,3,0],
+            [0,0,0]
+        ],
+        [
+            [4,4,0],
+            [0,4,4],
+            [0,0,0]
+        ],
+        [
+            [5,0,0],
+            [5,5,5],
+            [0,0,0]
+        ],
+        [
+            [0,0,6],
+            [6,6,6],
+            [0,0,0]
+        ],
+        [
+            [0,0,0,0],
+            [7,7,7,7],
+            [0,0,0,0],
+            [0,0,0,0]
+        ]
+    ]
+    
+return BLOCK_SET[getRandomIndex(BLOCK_SET.length)];
+}
+
+function initMatrix(rows, cols) {
+    let matrix = [];
+    for(let y=0; y < rows; y++) {
+        matrix.push(new Array(cols).fill(0));
+    }
+    return matrix;
+}
+
+function stack(block, matrix) {
+    block.shape.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if(value > 0) {
+                matrix[y+block.y][x+block.x] = block.shape[y][x];
+            }
+        });
+    });
+}
+function move(block, x, y) {
+    block.x += x;
+    block.y += y;
+}
+
+function rotate(block) {
+    block.shape.forEach((row, y) => {
+        for(let x=0; x < y; x++) {
+            const tempValue = block.shape[x][y];
+            block.shape[x][y] = block.shape[y][x]
+            block.shape[y][x] = tempValue;
+        }
+    });
+
+    block.shape.forEach((row) => {
+        row.reverse();
+    });
+}
+
+
+function validate(block, matrix) {
+    let isValid = true;
+
+    block.shape.some((row, dy) => {
+        row.some((value, dx) => {
+            if(value > 0) {
+                if(block.x+dx < 0 || block.x+dx >= matrix[0].length ||
+                   block.y+dy < 0 || block.y+dy >= matrix.length ||
+                   matrix[block.y+dy][block.x+dx] > 0) { //추가된 조건
+                    isValid = false;
+                    return true;
+                }
+            }
+        });
+        if(!isValid) {
+            return true;
+        }
+    });
+
+    return isValid;
+}
+
+
+function validMove(block, matrix, x, y) {
+    const cloneBlock = clone(block);
+    move(cloneBlock, x, y);
+    if(validate(cloneBlock, matrix)) {
+        move(block, x, y);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function validRotate(block, matrix) {
+    const cloneBlock = clone(block);
+    rotate(cloneBlock);
+    if(validate(cloneBlock, matrix)) {
+        rotate(block);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+</script>
+{% endblock %}

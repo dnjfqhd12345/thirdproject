@@ -31,7 +31,14 @@
     <!-- jQuery JS -->
     <script src="{% static 'jquery-3.4.1.min.js' %}"></script>
     <!-- Bootstrap JS -->
-    <script src="{% static 'bootstrap.min.js' %}"></script>
+    <link href="{% static '\tetris\common.css' %}" rel="stylesheet"/>
+    <script defer src="{% static 'bootstrap.min.js' %}"></script>
+    <script defer src="{% static 'tetris/js/common.js' %}"></script>
+    <script defer src="{% static 'tetris/js/matrix.js' %}"></script>
+    <script defer src="{% static 'tetris/js/move.js' %}"></script>
+    <script defer src="{% static 'tetris/js/draw.js' %}"></script>
+    <script defer src="{% static 'tetris/js/global.js' %}"></script>
+    <script defer src="{% static 'tetris/js/main.js' %}"></script>
 <!-- 자바스크립트 Start -->
 {% block script %}
 {% endblock %}

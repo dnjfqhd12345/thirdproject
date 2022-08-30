@@ -10,6 +10,7 @@ app_name = 'wyw'
 urlpatterns = [
      path('profile/', base_views.profile, name='profile'),
      path('agecal/', base_views.agecal, name='agecal'),
+     path('tetris/', base_views.tetris, name='tetris'),
 
     # path('',base_views.index, name='index'),
     # path('<int:posting_id>/', base_views.detail, name='detail'),
