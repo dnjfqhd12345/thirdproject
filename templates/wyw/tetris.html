@@ -8,9 +8,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>테트리스</title>
-    {% load static %}
-    <link href="{% static '\tetris\common.css' %}" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
+<fieldset class="title">
+    <legend>테트리스 v1.0</legend>
 <body>
     <div class="wrap">
         <div class="main-contests">
@@ -18,10 +19,10 @@
         </div>
         <div id="side-contents" class="side-contents">
             <canvas id="next-board" class="next-board"></canvas>
-            <p>레벨: <span id="level">1</span></p>
-            <p>라인: <span id="lines">0</span></p>
+            <p>레벨: <span id="level">1</span> <span id="level-up" class="level-up"></span></p>
+            <p>라인: <span id="lines">0</span> <span id="remove-lines" class="remove-lines"></span></p>
             <p>점수: <span id="score">0</span> <span id="add-score" class="add-score"></span></p>
-            <p>
+        <p>
                 <button type="button" id="start-button" onclick="start()" class="btn btn-primary">게임시작</button>
 
             </p>
@@ -33,26 +34,56 @@
                 <button type="button" button id="pause-button" onclick="pause()" class="btn btn-warning">일시정지</button>
 
             </p>
-
+            <div class="instructor">
+            <fieldset class="border p-2">
+                <legend>사용설명서</legend>    
+                <p>↑ : 블록 모양 바꾸기</p>
+                <p>↓ : 블록 1칸 내리기</p>
+                <p>← : 블록 왼쪽으로 이동</p>
+                <p>→ : 블록 오른쪽으로 이동</p>
+                <p>SPACE : 블록 바로 내리기</p>
+            </fieldset>
+            </div>
         </div>
     </div>
-    <!-- 합쳐지고 최소화된 최신 CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <div id="bottom-container" class="bottom-container">
+        <div id="keypad" class="keypad">
+            <div class="arrow-key-container">
+                <div class="arrow-key-up-line">
+                    <button id="up-key" class="btn btn-outline-dark" onclick="pressKey(38)"><span style="font-size:xx-large;">↑</span></button>
+                </div>
+                <div class="arrow-key-down-line">
+                    <button id="left-key" class="btn btn-outline-dark" onclick="pressKey(37)"><span style="font-size:xx-large;">←</span></button>
+                    <button id="down-key" class="btn btn-outline-dark" onclick="pressKey(40)"><span style="font-size:xx-large;">↓</span></button>
+                    <button id="right-key" class="btn btn-outline-dark" onclick="pressKey(39)"><span style="font-size:xx-large;">→</span></button>                        
+                </div>
+            </div>
+            <button id="space-key" class="btn btn-outline-dark" onclick="pressKey(32)"><span style="font-size:xx-large;">SPACE</span></button>
+        </div>
+    </div>
 
-<!-- 부가적인 테마 -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
-
-<!-- 합쳐지고 최소화된 최신 자바스크립트 -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    </div>
 
 </body>
-</html>
+
+</fieldset>
 <style>
-    html {
+    /* html {
     font-size: 10px;
+} */
+
+.tetris {
+  width: 480px;
+  margin: 0 auto;
+}
+
+
+.instructor {
+    font-size: 15px;
 }
 
 .wrap {
+    text-align: center;
     display: grid;
     grid-template-columns: 2fr 1fr;
     width: fit-content;
@@ -74,7 +105,87 @@
 .next-board {
     border: 2px solid black;
 }
+
+* {
+    touch-action: manipulation;
+    -ms-user-select: none;
+    -moz-user-select: -moz-none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    user-select:none;
+}
+
+.bottom-container {
+    display: grid;
+    width: 97vw;
+    height: 27vh;
+    grid-template-rows: 2fr 1fr;
+    max-width: 660px;
+}
+
+.keypad {
+    display: grid;
+    grid-template-columns:2fr 1fr;
+}
+
+.arrow-key-container {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+}
+
+.arrow-key-up-line {
+    display: grid;
+    /* grid-template-columns: 3fr 1fr; */
+}
+
+.arrow-key-down-line {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.arrow-key {
+    border: 2px solid black;
+    background-color: #ddd7ff;
+    color: #1f0d83;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    height: 9vh;
+}
+
+.rotation-key {
+    border: 2px solid black;
+    background-color: #ddd7ff;
+    color: #1f0d83;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    height: 9vh;
+}
+
+.down-key {
+    border: 2px solid black;
+    background-color: #ddd7ff;
+    color: #1f0d83;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    height: 9vh;
+}
+
+.space-key {
+    font-size: 80px;
+    border: 2px solid black;
+    background-color: white;
+    color: #1f0d83;
+    text-align: center;
+    padding: 0;
+    margin: 0;
+    height: 18vh;
+}
+
 </style>
+
 <script>
     function getRandomIndex(length) {
     return Math.floor(Math.random()*length);
@@ -83,7 +194,6 @@
 function clone(obj) {
     return JSON.parse(JSON.stringify(obj));
 }
-
 function drawBlock(block, ctx) {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -107,23 +217,63 @@ function drawBoard(matrix, ctx) {
         });
     });
 }
+
+
+
+function drawRemovingLines(ctx, cols, lineIndexes) {
+    lineIndexes.forEach((y, i) => {
+        for(let x=0; x<cols; x++) {
+            ctx.fillStyle = 'red';
+            ctx.fillRect(x, y, 1, 1);
+        }
+    })
+}
 const canvasMainBoard = document.querySelector('#main-board');
 const ctxMainBoard = canvasMainBoard.getContext('2d');
 const canvasNextBoard = document.querySelector("#next-board");
 const ctxNextBoard = canvasNextBoard.getContext('2d');
 
 const COLS_MAIN_BOARD = 10;
-const ROWS_MAIN_BOARD=20;
+const ROWS_MAIN_BOARD = 20;
 const COLS_NEXT_BOARD = 4;
 const ROWS_NEXT_BOARD = 4;
 
 var mainBlock = null;
 var nextBlock = null;
 
-const matrixMainBoard = initMatrix(ROWS_MAIN_BOARD, COLS_MAIN_BOARD);
+var matrixMainBoard = initMatrix(ROWS_MAIN_BOARD, COLS_MAIN_BOARD);
 
 let time = 0;
 let requestAnimationId = null;
+
+let timeForRemovingLines = 0;
+let filledLines = [];
+
+let gameStatus = null;
+
+const startButton = document.querySelector('#start-button');
+const quitButton = document.querySelector('#quit-button');
+const pauseButton = document.querySelector('#pause-button');
+
+
+let totalScore = 0;
+let scoreElem = document.querySelector('#score');
+let addScoreElem = document.querySelector('#add-score');
+let addScoreId = null;
+let globalAddScore = 0;
+
+let remaningLines = 0;
+let linesElem = document.querySelector('#lines');
+let removeLinesElem = document.querySelector('#remove-lines');
+let removeLinesId = null;
+
+let currentLevel = 1;
+
+let levelElem = document.querySelector('#level');
+let levelUpElem = document.querySelector('#level-up');
+let levelUpId = null;
+
+let highScoreElem = document.querySelector('#high-score');
 
 function resize() {
     const WINDOW_INNERWIDTH = (window.innerWidth > 660)?660:window.innerWidth;
@@ -140,6 +290,18 @@ function resize() {
 
     const FONT_RATIO = WINDOW_INNERWIDTH/350;
     document.querySelector("#side-contents").getElementsByClassName.fontSize = FONT_RATIO+'rem'
+
+    setButtonStyle(startButton, WINDOW_INNERWIDTH);
+    setButtonStyle(quitButton, WINDOW_INNERWIDTH);
+    setButtonStyle(pauseButton, WINDOW_INNERWIDTH);
+}
+
+function setButtonStyle(elem, width) {
+    elem.style.fontSize = width/350+'rem';
+    elem.style.paddingTop = width/1400+'rem';
+    elem.style.paddingBottom = width/1400+'rem';
+    elem.style.paddingLeft = width/350+'rem';
+    elem.style.paddingRight = width/650+'rem';
 }
 
 (function (){
@@ -147,13 +309,50 @@ function resize() {
 })();
 
 function main() {
+    window.addEventListener("click", event => {});
     window.addEventListener('keydown', keyHandler);
     mainBlock = createNextBlock();
     nextBlock = createNextBlock();
     rebuild();
-    window.addEventListener('resize', resize);
+    window.addEventListener('resize', rebuild);
     repeatMotion(0);
 }
+
+
+
+function reset() {
+    matrixMainBoard = initMatrix(ROWS_MAIN_BOARD, COLS_MAIN_BOARD);
+    resetScoreBoard();
+    time = 0;
+    timeForRemovingLines = 0;
+    mainBlock = null;
+    nextBlock = null;
+}
+
+function start() {
+    reset();
+    gameStatus = 'A';
+    window.addEventListener('keydown', keyHandler);
+    setNextBlock();
+    repeatMotion(0);
+
+
+}
+
+function resetScoreBoard() {
+    totalScore = 0;
+    scoreElem.textContent = "0";
+    addScoreElem.textContent = "";
+
+    currentLevel = 1;
+    levelElem.textContent = "1";
+    levelUpElem.textContent = "";
+
+    remaningLines = 0;
+    linesElem.textContent = "0";
+    removeLinesElem.textContent = "";
+}
+
 
 function createNextBlock() {
     const nextBlock = {
@@ -171,38 +370,230 @@ function rebuild() {
     resize();
     drawBlock(mainBlock, ctxMainBoard);
     drawBlock(nextBlock, ctxNextBoard);
-    drawBoard(matrixMainBoard, ctxMainBoard); //추가된 부분
+    drawBoard(matrixMainBoard, ctxMainBoard);
+    drawRemovingLines(ctxMainBoard, COLS_MAIN_BOARD, filledLines); // 추가된 부분
 }
 
 function keyHandler(event) {
+
+    if(typeof event.preventDefault != 'undefined') {
+        event.preventDefault();
+    }
+
+
     const inputKey = event.keyCode;
 
     const KEY = {
         LEFT: 37,
         UP: 38,
         RIGHT: 39,
-        DOWN: 40
+        DOWN: 40,
+        SPACE: 32
     }
 
     switch(inputKey) {
         case KEY.UP :
-            validRotate(mainBlock, matrixMainBoard);
+            if(gameStatus === 'A') validRotate(mainBlock, matrixMainBoard);
             break;
         case KEY.DOWN :
-            validMove(mainBlock, matrixMainBoard, 0, 1);
+            if(gameStatus === 'A') {
+                if(validMove(mainBlock, matrixMainBoard, 0, 1)) {
+                    addScore(10*currentLevel); // 점수 계산
+                } else {
+                    nextStep();
+                    time = 0;
+                };
+            }
             break;
         case KEY.LEFT :
-            validMove(mainBlock, matrixMainBoard, -1, 0);
+            if(gameStatus === 'A') validMove(mainBlock, matrixMainBoard, -1, 0);
             break;
         case KEY.RIGHT :
-            validMove(mainBlock, matrixMainBoard, 1, 0);
+            if(gameStatus === 'A') validMove(mainBlock, matrixMainBoard, 1, 0);
             break;
+        case KEY.SPACE :
+            if(gameStatus === 'A') {
+                while(validMove(mainBlock, matrixMainBoard, 0, 1)) {
+                    globalAddScore += 20*currentLevel; // 점수 계산
+                };
+                nextStep();
+                time = 0;
+            }
+            break;
+    
     }
 
-    drawBlock(mainBlock, ctxMainBoard);
+    // drawBlock(mainBlock, ctxMainBoard);
 }
 
+function setNextBlock() {
+    mainBlock = nextBlock?nextBlock:createNextBlock();
+    mainBlock.y = 0;
+    mainBlock.x = 3;
+    nextBlock = createNextBlock();
+    nextBlock.y = (nextBlock.shape[1][0]===7)?0:1;
+    nextBlock.x = (nextBlock.shape[0][0]===1)?1:0;
+}
+
+
+function initRemoveLines() {
+    filledLines = [];
+    timeForRemovingLines = 0;
+    time = 0;
+}
+
+function nextStep() {
+    stack(mainBlock, matrixMainBoard);
+    filledLines = checkFilledLines(matrixMainBoard);
+
+    if(filledLines.length === 0) {
+        addScore(globalAddScore); // 추가
+        globalAddScore = 0; // 추가
+        matrixMainBoard[0].some((value, x) => {
+            if(value > 0) {
+                gameStatus = 'Q';
+                return true;
+            }
+        });
+
+        const cloneNextBlock = clone(nextBlock);
+        cloneNextBlock.y = 0;
+        cloneNextBlock.x = 3;
+        if(validate(cloneNextBlock, matrixMainBoard)) {
+            setNextBlock();
+        } else {
+            gameStatus = 'Q';
+        }
+    }
+}
+
+function quit() {
+    window.cancelAnimationFrame(requestAnimationId);
+    requestAnimationId = null;
+    window.removeEventListener('keydown', keyHandler);
+
+    ctxMainBoard.fillStyle = '#f0b71b';
+    ctxMainBoard.fillRect(1, 3, 8, 1.8);
+    ctxMainBoard.font = '0.3px NeoDungGeunMo';
+    ctxMainBoard.fillStyle = '#ffffff';
+    ctxMainBoard.fillText('게임 오버. 게임 시작을 누르면 게임이 시작됩니다.', 1.8, 4.2);
+    gameStatus = 'Q';
+}
+
+
+function pause() {
+    if(requestAnimationId) {
+        window.cancelAnimationFrame(requestAnimationId);
+        requestAnimationId = null;
+        gameStatus = 'P';
+        
+        ctxMainBoard.fillStyle = '#6f9cf0';
+        ctxMainBoard.fillRect(1, 3, 8, 1.8);
+        ctxMainBoard.font = '1px NeoDungGeunMo';
+        ctxMainBoard.fillStyle = '#ffffff';
+        ctxMainBoard.fillText("일시 정지", 2.8, 4.2);
+    
+    } else {
+        gameStatus = 'A';
+        repeatMotion(0);
+    }
+}
+
+// function repeatMotion(timeStamp) {
+
+//     if(time === 0) {
+//         time = timeStamp;
+//     }
+//     if(timeStamp - time > 500) {
+//         if(!validMove(mainBlock, matrixMainBoard, 0, 1)) {
+//             nextStep(); // 기존 로직 nextStep 함수로 이동
+//         }
+//         time = timeStamp;
+//     }
+
+//     // 라인 제거 추가
+//     if(filledLines.length > 0) {
+//         if(timeForRemovingLines === 0) {
+//             timeForRemovingLines = timeStamp;
+//         }
+
+//         if(timeStamp - timeForRemovingLines > 300) {
+//             removeLines(matrixMainBoard, filledLines);
+//             initRemoveLines();
+//             setNextBlock();
+//         }
+//     }
+
+//     if(filledLines.length > 0) {
+//         if(timeForRemovingLines === 0) {
+//             timeForRemovingLines = timeStamp;
+//         }
+
+//         if(timeStamp - timeForRemovingLines > 100) {
+//             removeLines(matrixMainBoard, filledLines);
+//             globalAddScore += 100*filledLines.length*currentLevel;
+//             addScore(globalAddScore); // 추가
+//             globalAddScore = 0; // 추가
+//             initRemoveLines();
+//             setNextBlock();
+
+//             addLines(filledLines.length*-1);
+
+//             while(remaningLines <= 0) {
+//                 addLevel(1);
+//                 addLines(3*currentLevel);
+//             }
+//             initRemoveLines();
+//             setNextBlock();
+
+//         }
+//     }
+
+
+
+//     rebuild();
+//     if(gameStatus === 'A') { // 변경한 부분
+//         requestAnimationId = window.requestAnimationFrame(repeatMotion);
+//     } else {
+//         quit();
+//     }
+// }
+
+
 function repeatMotion(timeStamp) {
+    if(time === 0) {
+        time = timeStamp;
+    }
+
+    if(timeStamp - time > 500) {
+        if(!validMove(mainBlock, matrixMainBoard, 0, 1)) {
+            nextStep(); // 기존 로직 nextStep 함수로 이동
+        }
+        time = timeStamp;
+    }
+
+    // 라인 제거 추가
+    if(filledLines.length > 0) {
+        if(timeForRemovingLines === 0) {
+            timeForRemovingLines = timeStamp;
+        }
+
+        if(timeStamp - timeForRemovingLines > 100) {
+            removeLines(matrixMainBoard, filledLines);
+            globalAddScore += 100*filledLines.length*currentLevel;
+            addScore(globalAddScore); // 추가
+            globalAddScore = 0; // 추가
+            addLines(filledLines.length*-1);
+
+            while(remaningLines <= 0) {
+                addLevel(1);
+                addLines(3*currentLevel);
+            }
+            initRemoveLines();
+            setNextBlock();
+        }
+    }
+
     const duration = timeStamp - time;
 
     if(duration > 1000) {
@@ -228,9 +619,120 @@ function repeatMotion(timeStamp) {
         time = timeStamp;
     }
 
+    if(filledLines.length > 0) {
+        if(timeForRemovingLines === 0) {
+            timeForRemovingLines = timeStamp;
+        }
+
+        if(timeStamp - timeForRemovingLines > 100) {
+            removeLines(matrixMainBoard, filledLines);
+            globalAddScore += 100*filledLines.length*currentLevel;
+            addScore(globalAddScore); // 추가
+            globalAddScore = 0; // 추가
+            addLines(filledLines.length*-1);
+
+            while(remaningLines <= 0) {
+                addLevel(1);
+                addLines(3*currentLevel);
+            }
+            initRemoveLines();
+            setNextBlock();
+        }
+    }
+
+
     rebuild();
-    requestAnimationId = window.requestAnimationFrame(repeatMotion);
+    if(gameStatus === 'A') { // 변경한 부분
+        requestAnimationId = window.requestAnimationFrame(repeatMotion);
+    } else {
+        quit();
+    }
 }
+
+
+function addScore(score) {
+    totalScore += score;
+    scoreElem.textContent = totalScore;
+    if(score > 0) {
+        addScoreElem.textContent = '+' + score;
+    }
+    if(addScoreId){
+        clearTimeout(addScoreId);
+    }
+    addScoreId = setTimeout(() => {
+        addScoreElem.textContent = "";
+    }, 1000);
+}
+
+
+function addLines(lines) {
+    remaningLines += lines;
+    linesElem.textContent = remaningLines;
+    if(lines < 0) {
+        removeLinesElem.textContent = lines;
+    }
+    if(removeLinesId){
+        clearTimeout(removeLinesId);
+    }
+    removeLinesId = setTimeout(() => {
+        removeLinesElem.textContent = "";
+    }, 1000);
+}
+
+
+function addLevel(level) {
+    currentLevel += level;
+    levelElem.textContent = currentLevel;
+    if(level > 0) {
+        levelUpElem.textContent = "레벨 업!";
+    }
+    if(levelUpId){
+        clearTimeout(levelUpId);
+    }
+    levelUpId = setTimeout(() => {
+        levelUpElem.textContent = "";
+    }, 2000);
+
+}
+
+function makeOneLine() {
+    cloneBoard = JSON.parse(JSON.stringify(matrixMainBoard));
+
+    const randomIndex = getRandomIndex(COLS_MAIN_BOARD);
+    const opacitySet = ['1.0','0.95','0.9','0.85'];
+    let tempBoard = [];
+    let tempOptions = [];
+    for(let x=0; x < COLS_MAIN_BOARD;x++){
+        if(x === randomIndex) {
+            tempBoard.push(0);
+            tempOptions.push({opacity: '1.0'});
+        } else {
+            tempBoard.push(8);
+            tempOptions.push({opacity: opacitySet[getRandomIndex(4)]});
+        }
+    }
+
+    cloneBoard.board.shift();
+    cloneBoard.board.push(tempBoard);
+    cloneBoard.options.shift();
+    cloneBoard.options.push(tempOptions);
+
+
+    let cloneBlock = JSON.parse(JSON.stringify(mainBlock));
+    if(validMove(cloneBlock, cloneBoard, 0, 0)){
+        matrixMainBoard = cloneBoard;
+    }
+}
+
+function pressKey(keyCode) {
+    if(gameStatus === 'A' || gameStatus === 'P') {
+        const obj = {
+            keyCode: keyCode
+        };
+        keyHandler(obj);
+    }
+}
+
 function randomNextBlockMatrix() {
     const BLOCK_SET = [
         [
@@ -290,6 +792,23 @@ function stack(block, matrix) {
         });
     });
 }
+
+function checkFilledLines(matrix) {
+    result = [];
+    for(let y=0; y < matrix.length; y++) {
+        if(matrix[y].every(value => value > 0)) {
+            result.push(y);
+        }
+    }
+    return result;
+}
+
+function removeLines(matrix, lineIndexes) {
+    lineIndexes.forEach((y, i) => {
+        matrix.splice(y, 1);
+        matrix.unshift(new Array(matrix[0].length).fill(0));
+    });
+}
 function move(block, x, y) {
     block.x += x;
     block.y += y;
@@ -317,10 +836,10 @@ function validate(block, matrix) {
         row.some((value, dx) => {
             if(value > 0) {
                 if(block.x+dx < 0 || block.x+dx >= matrix[0].length ||
-                   block.y+dy < 0 || block.y+dy >= matrix.length ||
-                   matrix[block.y+dy][block.x+dx] > 0) { //추가된 조건
-                    isValid = false;
-                    return true;
+                    block.y+dy < 0 || block.y+dy >= matrix.length ||
+                    matrix[block.y+dy][block.x+dx] > 0) { //추가된 조건
+                     isValid = false;
+                     return true;
                 }
             }
         });
@@ -331,7 +850,6 @@ function validate(block, matrix) {
 
     return isValid;
 }
-
 
 function validMove(block, matrix, x, y) {
     const cloneBlock = clone(block);
@@ -356,4 +874,9 @@ function validRotate(block, matrix) {
 }
 
 </script>
+
+</html>
+
+
+
 {% endblock %}
