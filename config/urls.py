@@ -8,6 +8,7 @@ from django.urls import re_path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('chat/', include('chat.urls')),
     path('whatyourweb/',include('wyw.urls')),
     path('account/',include('account.urls'),),
     path('',base_views.index, name='index'),
